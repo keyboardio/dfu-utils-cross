@@ -24,7 +24,7 @@ export OS=`uname -o || uname`
 cd libusb && ./bootstrap.sh && cd ..
 cd dfu-util && ./autogen.sh && cd ..
 
-./compile_win.sh
+CROSS_TRIPLE=i686-w64-mingw32 ./compile_win.sh
 ./compile_linux.sh
 ./compile_mac.sh
 

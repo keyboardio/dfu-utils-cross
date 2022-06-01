@@ -16,20 +16,13 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 
-# Intel builds want -lrt. ARM builds don't
-export CFLAGS="-lrt"
-build_linux "distrib/linux64" "x86_64-ubuntu16.04-linux-gnu"
-build_linux "distrib/linux32" "i686-ubuntu16.04-linux-gnu"
-export CFLAGS=""
-
-build_linux "distrib/arm" "arm-linux-gnueabihf"
-build_linux "distrib/arm64" "aarch64-linux-gnu"
-
 
 function build_linux () {
-	local dist_dir = "$1"
-	local archname = "$2"
-	
+	local dist_dir="$1"
+	local arch_name="$2"
+
+
+	export CROSS_TRIPLE=$arch_name
 	mkdir -p $dist_dir
 
 	cd libusb
@@ -46,3 +39,19 @@ function build_linux () {
 	cp src/dfu-suffix src/dfu-prefix src/dfu-util "../$dist_dir"
 	cd ..
 }
+
+# Intel builds want -lrt. ARM builds don't
+export CFLAGS="-lrt"
+if [ -n $BUILD_IN_DOCKER ]; then
+build_linux "distrib/linux64" "i386-linux-gnu"
+build_linux "distrib/linux32" "x86_64-linux-gnu"
+else
+build_linux "distrib/linux64" "x86_64-ubuntu16.04-linux-gnu"
+build_linux "distrib/linux32" "i686-ubuntu16.04-linux-gnu"
+fi
+
+export CFLAGS=""
+
+build_linux "distrib/arm" "arm-linux-gnueabihf"
+build_linux "distrib/arm64" "aarch64-linux-gnu"
+
